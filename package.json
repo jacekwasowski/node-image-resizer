@@ -1,0 +1,27 @@
+{
+  "name": "node-images-resizer",
+  "version": "1.0.0",
+  "description": "Get some image and make it smaller copies.",
+  "main": "index.js",
+  "dependencies": {
+    "image-size": "0.6.1",
+    "jimp": "0.2.28"
+  },
+  "devDependencies": {
+    "eslint": "4.3.0",
+    "eslint-config-airbnb-base": "11.3.1",
+    "eslint-plugin-import": "2.7.0",
+    "expect.js": "^0.3.1",
+    "mocha": "3.5.0"
+  },
+  "scripts": {
+    "dev": "node test",
+    "test": "mocha",
+    "lint": "eslint src"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "author": "Jacek Wasowski",
+  "license": "MIT"
+}
