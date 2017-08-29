@@ -1,4 +1,4 @@
-const resizer = require('./index');
+const resizer = require('./');
 
 const versions = [{
   suffix: '_large',
