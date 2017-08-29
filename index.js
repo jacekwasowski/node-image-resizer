@@ -2,7 +2,6 @@ const path = require('path');
 const jimp = require('jimp');
 const sizeOf = require('image-size');
 const log = require('./log');
-const fileExists = require('./file-exists');
 
 function getFileNameWithPath(file, settings) {
   const prefix = settings.prefix || '';
@@ -36,13 +35,8 @@ function writeFile(processedImage, fileNameWithPath) {
   return processedImage.write(fileNameWithPath);
 }
 
-module.exports = async (image, setup) => {
-  if (!await fileExists(image)) {
-    log.error(`Source file ${image} does not exists`);
-    return false;
-  }
-
-  return setup.versions.forEach(async (version) => {
+module.exports = (image, setup) => {
+  setup.versions.forEach(async (version) => {
     try {
       const settings = Object.assign({}, setup.all, version);
       const processedImage = await getProcessedImage(image, settings);
@@ -51,8 +45,7 @@ module.exports = async (image, setup) => {
       writeFile(processedImage, fileNameWithPath);
       log.info(`Saved: ${fileNameWithPath}`);
     } catch (e) {
-      log.error(`\nProblem with processing ${image}`);
-      log.error(` • error log: ${e}\n`);
+      log.error(`Problem with processing ${image}: ${e}`);
     }
   });
 };

@@ -24,6 +24,5 @@ const setup = {
   versions,
 };
 
-(async () => {
-  await resizer('./test-images/test-image.png', setup);
-})();
+resizer('./test-images/test-image.png', setup);
+resizer('./test-images/test-imageXS.png', setup);
