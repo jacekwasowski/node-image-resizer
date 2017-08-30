@@ -16,7 +16,6 @@
     "sinon": "3.2.1"
   },
   "scripts": {
-    "dev": "node test",
     "test": "mocha",
     "lint": "eslint src"
   },
