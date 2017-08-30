@@ -31,15 +31,15 @@ async function getProcessedImage(image, settings) {
   return applyFilters(scaledImage, settings);
 }
 
-async function saveFile(processedImage, fileNameWithPath) {
-  await processedImage.write(fileNameWithPath);
+function saveFile(processedImage, fileNameWithPath) {
+  processedImage.write(fileNameWithPath);
 }
 
 async function generateAndSave(image, settings) {
   try {
     const processedImage = await getProcessedImage(image, settings);
     const fileNameWithPath = getFileNameWithPath(image, settings);
-    await saveFile(processedImage, fileNameWithPath);
+    saveFile(processedImage, fileNameWithPath);
     log.info(`Saved: ${fileNameWithPath}`);
   } catch (e) {
     log.error(`Problem with processing ${image}: ${e}`);
@@ -49,6 +49,7 @@ async function generateAndSave(image, settings) {
 module.exports = (image, setup) => {
   return Promise.all(setup.versions.map((version) => {
     const settings = Object.assign({}, setup.all || {}, version);
+
     return generateAndSave(image, settings);
   }));
 };
