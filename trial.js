@@ -1,3 +1,5 @@
+/* eslint no-console:0 */
+
 const resizer = require('./');
 
 const versions = [{
@@ -30,7 +32,6 @@ resizer('./test-images/6.jpg', setup).then(() => {
 });
 
 
-
 resizer('./test-images/1.png', setup).then(() => {
   console.log(': 1');
 });
@@ -56,6 +57,6 @@ resizer('./test-images/4.jpg', setup).then(() => {
 
 
 (async () => {
-  await resizer('./test-images/7.jpg', setup);
+  await resizer('./xtest-images/7.jpg', setup);
   console.log(': 7');
 })();
