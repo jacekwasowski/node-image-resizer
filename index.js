@@ -3,6 +3,7 @@ const jimp = require('jimp');
 const sizeOf = require('image-size');
 const log = require('./log');
 
+
 function getFileNameWithPath(file, settings) {
   const prefix = settings.prefix || '';
   const suffix = settings.suffix || '';
@@ -10,6 +11,22 @@ function getFileNameWithPath(file, settings) {
 
   return `${settings.path}${prefix}${fileInfo.name}${suffix}${fileInfo.ext}`;
 }
+
+
+function getScaledImage(image, width, height) {
+  return image.scaleToFit(width, height);
+}
+
+
+function getImageResolution(image, settings) {
+  const resolution = sizeOf(image);
+
+  return {
+    width: settings.width || resolution.width,
+    height: settings.height || resolution.height,
+  };
+}
+
 
 function applyFilters(image, settings) {
   let processedImage = image;
@@ -21,19 +38,20 @@ function applyFilters(image, settings) {
   return processedImage;
 }
 
+
 async function getProcessedImage(image, settings) {
   const img = await jimp.read(image);
-  const resolution = sizeOf(image);
-  const width = settings.width || resolution.width;
-  const height = settings.height || resolution.height;
-  const scaledImage = img.scaleToFit(width, height);
+  const { width, height } = getImageResolution(image, settings);
+  const scaledImage = getScaledImage(img, width, height);
 
   return applyFilters(scaledImage, settings);
 }
 
+
 function saveFile(processedImage, fileNameWithPath) {
   processedImage.write(fileNameWithPath);
 }
+
 
 async function generateAndSave(image, settings) {
   try {
@@ -46,9 +64,13 @@ async function generateAndSave(image, settings) {
   }
 }
 
-module.exports = (image, setup) => {
-  return Promise.all(setup.versions.map((version) => {
-    const settings = Object.assign({}, setup.all || {}, version);
+
+module.exports = (image, setup = {}) => {
+  const versions = Array.isArray(setup.versions) ? setup.versions : [];
+  const setupForAll = setup.all || {};
+
+  return Promise.all(versions.map((version) => {
+    const settings = Object.assign({}, setupForAll, version);
 
     return generateAndSave(image, settings);
   }));

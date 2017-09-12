@@ -1,2 +1,5 @@
-test
 .idea/
+coverage/
+test/
+.eslintrc.yml
+*.test.js

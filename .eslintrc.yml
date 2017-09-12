@@ -1,13 +1,15 @@
 extends: airbnb-base
 env:
   node: true
-plugins: ["smells"]
+  jest: true
+plugins: [ "smells" ]
 rules:
   arrow-body-style: off
   newline-before-return: 2
   no-multiple-empty-lines: 2
-  no-param-reassign: [2, { props: false }]
-  smells/no-switch: 0
+  no-param-reassign: [ 2, { props: false } ]
+  no-underscore-dangle: ["error", { "allow": ["__set__"] }]
   smells/no-complex-switch-case: 1
   smells/no-setinterval: 1
+  smells/no-switch: 0
   smells/no-this-assign: 2
