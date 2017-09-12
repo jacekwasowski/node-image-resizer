@@ -4,11 +4,10 @@ const sizeOf = require('image-size');
 const log = require('./log');
 
 
-function getFileNameWithPath(file, settings) {
+function getFileNameWithPath(settings) {
   const prefix = settings.prefix || '';
   const suffix = settings.suffix || '';
-  const fileInfo = path.parse(file);
-
+  const fileInfo = path.parse(settings.source);
   return `${settings.path}${prefix}${fileInfo.name}${suffix}${fileInfo.ext}`;
 }
 
@@ -18,9 +17,8 @@ function getScaledImage(image, width, height) {
 }
 
 
-function getImageResolution(image, settings) {
-  const resolution = sizeOf(image);
-
+function getImageResolution(settings) {
+  const resolution = sizeOf(settings.source);
   return {
     width: settings.width || resolution.width,
     height: settings.height || resolution.height,
@@ -34,17 +32,7 @@ function applyFilters(image, settings) {
   if (settings.contast) processedImage = processedImage.contast(settings.contast);
   if (settings.brightness) processedImage = processedImage.brightness(settings.brightness);
   if (settings.quality) processedImage = processedImage.quality(settings.quality);
-
   return processedImage;
-}
-
-
-async function getProcessedImage(image, settings) {
-  const img = await jimp.read(image);
-  const { width, height } = getImageResolution(image, settings);
-  const scaledImage = getScaledImage(img, width, height);
-
-  return applyFilters(scaledImage, settings);
 }
 
 
@@ -53,25 +41,51 @@ function saveFile(processedImage, fileNameWithPath) {
 }
 
 
-async function generateAndSave(image, settings) {
+function generateAndSave(processedImage, settings) {
   try {
-    const processedImage = await getProcessedImage(image, settings);
-    const fileNameWithPath = getFileNameWithPath(image, settings);
-    saveFile(processedImage, fileNameWithPath);
+    const { width, height } = getImageResolution(settings);
+    const scaledImage = getScaledImage(processedImage, width, height);
+    const fileNameWithPath = getFileNameWithPath(settings);
+    const finalImage = applyFilters(scaledImage, settings);
+    saveFile(finalImage, fileNameWithPath);
     log.info(`Saved: ${fileNameWithPath}`);
   } catch (e) {
-    log.error(`Problem with processing ${image}: ${e}`);
+    log.error(`Problem with processing ${settings.source}: ${e}`);
   }
 }
 
 
-module.exports = (image, setup = {}) => {
-  const versions = Array.isArray(setup.versions) ? setup.versions : [];
-  const setupForAll = setup.all || {};
+async function getImageToProcess(source) {
+  try {
+    return await jimp.read(source);
+  } catch (e) {
+    log.error(`Problem with reading ${source}: ${e}`);
+    return null;
+  }
+}
 
-  return Promise.all(versions.map((version) => {
-    const settings = Object.assign({}, setupForAll, version);
 
-    return generateAndSave(image, settings);
+function areInputDataValid(setup) {
+  const { versions } = setup;
+  return (Array.isArray(versions) && versions.length);
+}
+
+
+module.exports = async (source, setup = {}) => {
+  const processedImage = await getImageToProcess(source);
+
+  if (!processedImage) {
+    // http://thecodebarbarian.com/unhandled-promise-rejections-in-node.js.html
+    return Promise.reject(new Error()).catch(() => {});
+  }
+
+  if (!areInputDataValid(setup)) {
+    log.error('Please specify input data');
+    return Promise.reject(new Error()).catch(() => {});
+  }
+
+  return Promise.all(setup.versions.map((version) => {
+    const settings = { ...(setup.all || {}), ...version, source };
+    return generateAndSave(processedImage, settings);
   }));
 };
