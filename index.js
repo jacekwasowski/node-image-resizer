@@ -56,12 +56,19 @@ function generateAndSave(processedImage, settings) {
 
 
 async function getImageToProcess(source) {
+  let processedImage;
+  let error;
+
   try {
-    return await jimp.read(source);
+    processedImage = await jimp.read(source);
   } catch (e) {
-    log.error(`Problem with reading ${source}: ${e}`);
-    return null;
+    error = e;
   }
+
+  return {
+    processedImage,
+    error,
+  };
 }
 
 
@@ -72,16 +79,16 @@ function areInputDataValid(setup) {
 
 
 module.exports = async (source, setup = {}) => {
-  const processedImage = await getImageToProcess(source);
+  const { processedImage, error } = await getImageToProcess(source);
 
-  if (!processedImage) {
-    // http://thecodebarbarian.com/unhandled-promise-rejections-in-node.js.html
-    return Promise.reject(new Error()).catch(() => {});
+  if (!processedImage || error) {
+    log.error(`Problem with reading ${source}, ${error.message}`);
+    return Promise.reject(new Error(error.message)).catch(() => {});
   }
 
   if (!areInputDataValid(setup)) {
     log.error('Please specify input data');
-    return Promise.reject(new Error()).catch(() => {});
+    return Promise.reject(new Error(error.message)).catch(() => {});
   }
 
   return Promise.all(setup.versions.map((version) => {
