@@ -1,7 +1,6 @@
 const path = require('path');
 const jimp = require('jimp');
 const sizeOf = require('image-size');
-const log = require('./log');
 
 
 function getFileNameWithPath(settings) {
@@ -28,10 +27,18 @@ function getImageResolution(settings) {
 
 function applyFilters(image, settings) {
   let processedImage = image;
-  if (settings.normalize) processedImage = processedImage.normalize();
-  if (settings.contast) processedImage = processedImage.contast(settings.contast);
-  if (settings.brightness) processedImage = processedImage.brightness(settings.brightness);
-  if (settings.quality) processedImage = processedImage.quality(settings.quality);
+  if (settings.normalize) {
+    processedImage = processedImage.normalize();
+  }
+  if (settings.contast) {
+    processedImage = processedImage.contast(settings.contast);
+  }
+  if (settings.brightness) {
+    processedImage = processedImage.brightness(settings.brightness);
+  }
+  if (settings.quality) {
+    processedImage = processedImage.quality(settings.quality);
+  }
   return processedImage;
 }
 
@@ -42,53 +49,32 @@ function saveFile(processedImage, fileNameWithPath) {
 
 
 function generateAndSave(processedImage, settings) {
-  try {
-    const { width, height } = getImageResolution(settings);
-    const scaledImage = getScaledImage(processedImage, width, height);
-    const fileNameWithPath = getFileNameWithPath(settings);
-    const finalImage = applyFilters(scaledImage, settings);
-    saveFile(finalImage, fileNameWithPath);
-    log.info(`Saved: ${fileNameWithPath}`);
-  } catch (e) {
-    log.error(`Problem with processing ${settings.source}: ${e}`);
-  }
+  const { width, height } = getImageResolution(settings);
+  const scaledImage = getScaledImage(processedImage, width, height);
+  const fileNameWithPath = getFileNameWithPath(settings);
+  const finalImage = applyFilters(scaledImage, settings);
+  saveFile(finalImage, fileNameWithPath);
+  return fileNameWithPath;
 }
 
 
-async function getImageToProcess(source) {
-  let processedImage;
-  let error;
-
-  try {
-    processedImage = await jimp.read(source);
-  } catch (e) {
-    error = e;
-  }
-
-  return {
-    processedImage,
-    error,
-  };
-}
-
-
-function areInputDataValid(setup) {
+function isInputDataValid(setup) {
   const { versions } = setup;
   return (Array.isArray(versions) && versions.length);
 }
 
 
 module.exports = async (source, setup = {}) => {
-  const { processedImage, error } = await getImageToProcess(source);
+  let processedImage;
 
-  if (!processedImage || error) {
-    log.error(`Problem with reading ${source}, ${error.message}`);
-    return Promise.reject(new Error(error.message)).catch(() => {});
+  if (!isInputDataValid(setup)) {
+    throw new Error('Invalid input data');
   }
 
-  if (!areInputDataValid(setup)) {
-    log.error('Please specify input data');
-    return Promise.reject(new Error(error.message)).catch(() => {});
+  try {
+    processedImage = await jimp.read(source);
+  } catch (error) {
+    throw new Error(`Problem with reading ${source}, ${error.message}`);
   }
 
   return Promise.all(setup.versions.map((version) => {

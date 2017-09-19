@@ -4,7 +4,6 @@
   "description": "Get image and make it smaller copies asynchronously",
   "main": "index.js",
   "dependencies": {
-    "chalk": "2.1.0",
     "image-size": "0.6.1",
     "jimp": "0.2.28"
   },
