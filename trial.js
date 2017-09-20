@@ -4,11 +4,11 @@ const resizer = require('./');
 
 const versions = [{
   suffix: '_large',
-  width: 1800,
+  width: 1000,
   quality: 60,
 }, {
   suffix: '_medium',
-  height: 600,
+  height: 500,
   contrast: 0.06,
 }, {
   suffix: '_small',

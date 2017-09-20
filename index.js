@@ -1,18 +1,13 @@
-const path = require('path');
-const jimp = require('jimp');
 const sizeOf = require('image-size');
+const { parse } = require('path');
+const { read } = require('jimp');
 
 
 function getFileNameWithPath(settings) {
+  const fileInfo = parse(settings.source);
   const prefix = settings.prefix || '';
   const suffix = settings.suffix || '';
-  const fileInfo = path.parse(settings.source);
   return `${settings.path}${prefix}${fileInfo.name}${suffix}${fileInfo.ext}`;
-}
-
-
-function getScaledImage(image, width, height) {
-  return image.scaleToFit(width, height);
 }
 
 
@@ -22,6 +17,11 @@ function getImageResolution(settings) {
     width: settings.width || resolution.width,
     height: settings.height || resolution.height,
   };
+}
+
+
+function getScaledImage(sourceImage, width, height) {
+  return sourceImage.scaleToFit(width, height);
 }
 
 
@@ -35,18 +35,15 @@ function applyFilters(image, settings) {
 }
 
 
-function saveFile(processedImage, fileNameWithPath) {
-  processedImage.write(fileNameWithPath);
+function saveFile(generatedImage, fileNameWithPath) {
+  generatedImage.write(fileNameWithPath);
 }
 
 
-function generateAndSave(processedImage, settings) {
+function generateImage(sourceImage, settings) {
   const { width, height } = getImageResolution(settings);
-  const scaledImage = getScaledImage(processedImage, width, height);
-  const fileNameWithPath = getFileNameWithPath(settings);
-  const finalImage = applyFilters(scaledImage, settings);
-  saveFile(finalImage, fileNameWithPath);
-  return fileNameWithPath;
+  const scaledImage = getScaledImage(sourceImage, width, height);
+  return applyFilters(scaledImage, settings);
 }
 
 
@@ -57,20 +54,23 @@ function isInputDataValid(setup = {}) {
 
 
 module.exports = async (source, setup = {}) => {
-  let processedImage;
+  let sourceImage;
 
   if (!isInputDataValid(setup)) {
     throw new Error('Invalid input data');
   }
 
   try {
-    processedImage = await jimp.read(source);
+    sourceImage = await read(source);
   } catch (error) {
     throw new Error(`Problem with reading ${source}, ${error.message}`);
   }
 
   return setup.versions.map((version) => {
     const settings = { ...(setup.all || {}), ...version, source };
-    return generateAndSave(processedImage, settings);
+    const fileName = getFileNameWithPath(settings);
+    const generatedImage = generateImage(sourceImage, settings);
+    saveFile(generatedImage, fileName);
+    return fileName;
   });
 };
