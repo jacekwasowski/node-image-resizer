@@ -27,18 +27,10 @@ function getImageResolution(settings) {
 
 function applyFilters(image, settings) {
   let processedImage = image;
-  if (settings.normalize) {
-    processedImage = processedImage.normalize();
-  }
-  if (settings.contast) {
-    processedImage = processedImage.contast(settings.contast);
-  }
-  if (settings.brightness) {
-    processedImage = processedImage.brightness(settings.brightness);
-  }
-  if (settings.quality) {
-    processedImage = processedImage.quality(settings.quality);
-  }
+  if (settings.normalize) processedImage = processedImage.normalize();
+  if (settings.contast) processedImage = processedImage.contast(settings.contast);
+  if (settings.brightness) processedImage = processedImage.brightness(settings.brightness);
+  if (settings.quality) processedImage = processedImage.quality(settings.quality);
   return processedImage;
 }
 
@@ -58,7 +50,7 @@ function generateAndSave(processedImage, settings) {
 }
 
 
-function isInputDataValid(setup) {
+function isInputDataValid(setup = {}) {
   const { versions } = setup;
   return (Array.isArray(versions) && versions.length);
 }
@@ -77,8 +69,8 @@ module.exports = async (source, setup = {}) => {
     throw new Error(`Problem with reading ${source}, ${error.message}`);
   }
 
-  return Promise.all(setup.versions.map((version) => {
+  return setup.versions.map((version) => {
     const settings = { ...(setup.all || {}), ...version, source };
     return generateAndSave(processedImage, settings);
-  }));
+  });
 };

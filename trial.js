@@ -27,7 +27,7 @@ const setup = {
 };
 
 
-resizer('./test-images/6x.jpg', setup).then((savedFiled) => {
+resizer('./test-images/6.jpg', setup).then((savedFiled) => {
   console.log(savedFiled);
 }).catch((err) => {
   console.log('error:', err.message);
