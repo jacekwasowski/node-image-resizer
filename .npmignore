@@ -1,5 +1,8 @@
 .idea/
 coverage/
 test/
+.babelrc
 .eslintrc.yml
 *.test.js
+jest.config.json
+package-lock.json
