@@ -2,13 +2,29 @@ extends: airbnb-base
 env:
   node: true
   jest: true
-plugins: [ "smells" ]
+  es6: true
+plugins: [ "unicorn", "smells" ]
 rules:
-  arrow-body-style: off
+  arrow-body-style: [ "error", "as-needed" ]
+  handle-callback-err: 2
   no-console: 2
-  no-multiple-empty-lines: 2
-  no-param-reassign: [ 2, { props: false } ]
-  no-underscore-dangle: ["error", { "allow": ["__Rewire__", "__ResetDependency__", "__GetDependency__"] }]
-  smells/no-complex-switch-case: 1
-  smells/no-switch: 0
+  no-multiple-empty-lines: [ 2, { max: 2, maxEOF: 1, maxBOF: 0 }]
+  no-param-reassign: 2
+  no-path-concat: 2
+  no-underscore-dangle: [ 2, { allow: ["__Rewire__", "__ResetDependency__", "__GetDependency__"] }]
+  smells/no-complex-switch-case: 2
   smells/no-this-assign: 2
+  unicorn/catch-error-name: [ 2, { name: err }]
+  unicorn/explicit-length-check: 2
+  unicorn/filename-case: [ 2, { case: kebabCase }]
+  unicorn/no-abusive-eslint-disable: 2
+  unicorn/no-process-exit: 2
+  unicorn/throw-new-error: 2
+  unicorn/number-literal-case: 2
+  unicorn/escape-case: 2
+  unicorn/no-array-instanceof: 2
+  unicorn/no-new-buffer: 2
+  unicorn/custom-error-definition: 2
+  unicorn/prefer-starts-ends-with: 2
+  unicorn/prefer-type-error: 2
+  yoda: 2
