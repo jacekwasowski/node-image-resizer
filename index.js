@@ -3,19 +3,19 @@ const { parse } = require('path');
 const { read } = require('jimp');
 
 
-function getFileNameWithPath(settings) {
-  const fileInfo = parse(settings.source);
-  const prefix = settings.prefix || '';
-  const suffix = settings.suffix || '';
-  return `${settings.path}${prefix}${fileInfo.name}${suffix}${fileInfo.ext}`;
+function getFileNameWithPath(setup) {
+  const fileInfo = parse(setup.source);
+  const prefix = setup.prefix || '';
+  const suffix = setup.suffix || '';
+  return `${setup.path}${prefix}${fileInfo.name}${suffix}${fileInfo.ext}`;
 }
 
 
-function getImageResolution(settings) {
-  const resolution = sizeOf(settings.source);
+function getImageResolution(setup) {
+  const resolution = sizeOf(setup.source);
   return {
-    width: settings.width || resolution.width,
-    height: settings.height || resolution.height,
+    width: setup.width || resolution.width,
+    height: setup.height || resolution.height,
   };
 }
 
@@ -25,12 +25,12 @@ function getScaledImage(sourceImage, width, height) {
 }
 
 
-function applyFilters(image, settings) {
+function applyFilters(image, setup) {
   let processedImage = image;
-  if (settings.normalize) processedImage = processedImage.normalize();
-  if (settings.contast) processedImage = processedImage.contast(settings.contast);
-  if (settings.brightness) processedImage = processedImage.brightness(settings.brightness);
-  if (settings.quality) processedImage = processedImage.quality(settings.quality);
+  if (setup.normalize) processedImage = processedImage.normalize();
+  if (setup.contast) processedImage = processedImage.contast(setup.contast);
+  if (setup.brightness) processedImage = processedImage.brightness(setup.brightness);
+  if (setup.quality) processedImage = processedImage.quality(setup.quality);
   return processedImage;
 }
 
@@ -40,36 +40,37 @@ function saveFile(generatedImage, fileNameWithPath) {
 }
 
 
-function generateImage(sourceImage, settings) {
-  const { width, height } = getImageResolution(settings);
+function generateImage(sourceImage, setup) {
+  const { width, height } = getImageResolution(setup);
   const scaledImage = getScaledImage(sourceImage, width, height);
-  return applyFilters(scaledImage, settings);
+  return applyFilters(scaledImage, setup);
 }
 
 
-function isInputDataValid(setup = {}) {
-  const { versions } = setup;
-  return (Array.isArray(versions) && versions.length);
+function isInputDataValid(settings) {
+  return (settings &&
+    Array.isArray(settings.versions) &&
+    settings.versions.length);
 }
 
 
-module.exports = async (source, setup = {}) => {
+module.exports = async (source, settings = {}) => {
   let sourceImage;
 
-  if (!isInputDataValid(setup)) {
-    throw new Error('Invalid input data');
+  if (!isInputDataValid(settings)) {
+    throw new Error('Invalid input data.');
   }
 
   try {
     sourceImage = await read(source);
   } catch (error) {
-    throw new Error(`Problem with reading ${source}, ${error.message}`);
+    throw new Error(`Problem with reading ${source}, ${error.message}.`);
   }
 
-  return setup.versions.map((version) => {
-    const settings = { ...(setup.all || {}), ...version, source };
-    const fileName = getFileNameWithPath(settings);
-    const generatedImage = generateImage(sourceImage, settings);
+  return settings.versions.map((version) => {
+    const setup = { ...(settings.all || {}), ...version, source };
+    const generatedImage = generateImage(sourceImage, setup);
+    const fileName = getFileNameWithPath(setup);
     saveFile(generatedImage, fileName);
     return fileName;
   });

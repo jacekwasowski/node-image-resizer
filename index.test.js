@@ -1,11 +1,17 @@
 import resizer, {
-  __RewireAPI__ as resierRewireAPI,
+  __RewireAPI__ as resizerRewireAPI,
 } from './';
 
+const SOURCE = 'test-images/image.jpg';
+const EXPECTED_OUTPUT = [
+  './results/image_large.jpg',
+  './results/image_medium.jpg',
+  './results/image_small.jpg',
+];
 const setup = {
   all: {
     brightness: 0,
-    path: './test/images/results/',
+    path: './results/',
     normalize: true,
     quality: 80,
     contrast: 0.045,
@@ -24,72 +30,80 @@ const setup = {
   }],
 };
 
-const jimpReadSpy = jest.fn().mockReturnValue('sourceImage');
-const pathParseSpy = jest.fn().mockReturnValue({
-  name: 'name',
-  ext: '.jpg',
-});
-const generateImageSpy = jest.fn();
-const saveFileSpy = jest.fn();
-const getFileNameWithPathSpy = jest.fn();
-const isInputDataValidSpy = jest.fn().mockReturnValue(true);
+let result;
 
 describe('node-images-resizer npm module', () => {
   describe('when calling', () => {
-    let result;
+    const read = jest.fn().mockReturnValue('sourceImage');
+    const generateImage = jest.fn();
+    const saveFile = jest.fn();
+    const isInputDataValid = jest.fn().mockReturnValue(true);
+
+    beforeAll(() => {
+      resizerRewireAPI.__Rewire__({
+        read, isInputDataValid, generateImage, saveFile,
+      });
+    });
+
+    afterAll(() => {
+      resizerRewireAPI.__ResetDependency__('read');
+      resizerRewireAPI.__ResetDependency__('isInputDataValid');
+      resizerRewireAPI.__ResetDependency__('generateImage');
+      resizerRewireAPI.__ResetDependency__('saveFile');
+    });
 
     beforeEach(async () => {
-      resierRewireAPI.__Rewire__('read', jimpReadSpy);
-      resierRewireAPI.__Rewire__('parse', pathParseSpy);
-      resierRewireAPI.__Rewire__('isInputDataValid', isInputDataValidSpy);
-      resierRewireAPI.__Rewire__('generateImage', generateImageSpy);
-      resierRewireAPI.__Rewire__('saveFile', saveFileSpy);
-      resierRewireAPI.__Rewire__('getFileNameWithPath', getFileNameWithPathSpy);
-
-      result = await resizer('test-images/6.jpg', setup);
+      result = await resizer(SOURCE, setup);
     });
 
     afterEach(() => {
-      resierRewireAPI.__ResetDependency__('read');
-      resierRewireAPI.__ResetDependency__('parse');
-      resierRewireAPI.__ResetDependency__('isInputDataValid');
-      resierRewireAPI.__ResetDependency__('generateImage');
-      resierRewireAPI.__ResetDependency__('saveFile');
-      resierRewireAPI.__ResetDependency__('getFileNameWithPath');
       jest.clearAllMocks();
     });
 
-    test('should validate input data', () => {
-      expect(isInputDataValidSpy).toHaveBeenCalledTimes(1);
-    });
-    test('should read source image', () => {
-      expect(jimpReadSpy).toHaveBeenCalledTimes(1);
-    });
-    test('should create file name with path for new file', () => {
-      expect(getFileNameWithPathSpy).toHaveBeenCalledTimes(3);
-    });
-    test('should generate images', () => {
-      expect(generateImageSpy).toHaveBeenCalledTimes(3);
-    });
-
-    test.skip('should return names of created files', () => {});
+    test('should validate input data', () => { expect(isInputDataValid).toHaveBeenCalledTimes(1); });
+    test('should read source image', () => { expect(read).toHaveBeenCalledWith(SOURCE); });
+    test('should generate images', () => { expect(generateImage).toHaveBeenCalledTimes(3); });
+    test('should return array of file names', () => { expect(result).toEqual(expect.arrayContaining(EXPECTED_OUTPUT)); });
   });
 
-  describe.skip('when validating data', () => {
-    test('should throw error if input data are invalid', () => {});
-    test('should NOT throw error if input data are valid', () => {});
+  describe('when validating data', () => {
+    test('should throw error if input data are invalid', async () => {
+      try {
+        await resizer(SOURCE, 'invalid_param');
+      } catch (err) {
+        expect(err.name).toEqual('Error');
+        expect(err.message).toEqual('Invalid input data.');
+      }
+
+      try {
+        await resizer(SOURCE, null);
+      } catch (err) {
+        expect(err.name).toEqual('Error');
+        expect(err.message).toEqual('Invalid input data.');
+      }
+    });
   });
 
-  describe.skip('when reading file', () => {
-    test('should throw error if problem with reading file', () => {});
-    test('should NOT throw error if NO problem with reading file', () => {});
+  describe('when reading file', () => {
+    test('should throw error if problem with reading file', async () => {
+      const read = jest.fn(() => { throw new Error('ERROR_MESSAGE'); });
+      resizerRewireAPI.__Rewire__({ read });
+
+      try {
+        await resizer('not_exists.jpg', setup);
+      } catch (err) {
+        expect(err.name).toEqual('Error');
+        expect(err.message).toEqual('Problem with reading not_exists.jpg, ERROR_MESSAGE.');
+      }
+
+      resizerRewireAPI.__ResetDependency__('read');
+    });
   });
 
-  describe.skip('when processing image', () => {
-    test('should read image', async () => {});
+  describe.skip('when generating image', () => {
+    test('should figure out new size of image', () => {});
     test('should scale image', () => {});
     test('should apply filters', () => {});
-    test('should create proper file name with path', () => {});
   });
 
   describe.skip('when applying filters', () => {
@@ -97,5 +111,9 @@ describe('node-images-resizer npm module', () => {
     test('should update contrast', () => {});
     test('should update brightness', () => {});
     test('should compress image by setting up quality', () => {});
+  });
+
+  describe('when creating file names', () => {
+    test('should ', () => {});
   });
 });

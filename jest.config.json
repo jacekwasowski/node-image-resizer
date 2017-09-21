@@ -1,5 +1,5 @@
 {
   "collectCoverage": true,
   "collectCoverageFrom" : [ "index.js" ],
-  "coverageReporters": [ "json" ]
+  "coverageReporters": [ "json", "html" ]
 }
