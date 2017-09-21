@@ -1,6 +1,6 @@
 import resizer, {
   __RewireAPI__ as resizerRewireAPI,
-} from './';
+} from '.';
 
 const SOURCE = 'test-images/image.jpg';
 const EXPECTED_OUTPUT = [
@@ -113,7 +113,9 @@ describe('node-images-resizer npm module', () => {
     test('should compress image by setting up quality', () => {});
   });
 
-  describe('when creating file names', () => {
-    test('should ', () => {});
+  describe.skip('when creating file names', () => {
+    test('should return file name with full path', () => {});
+    test('should return file name with prefix', () => {});
+    test('should return file name with suffix', () => {});
   });
 });

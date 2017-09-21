@@ -4,18 +4,18 @@ const { read } = require('jimp');
 
 
 function getFileNameWithPath(setup) {
-  const fileInfo = parse(setup.source);
   const prefix = setup.prefix || '';
   const suffix = setup.suffix || '';
-  return `${setup.path}${prefix}${fileInfo.name}${suffix}${fileInfo.ext}`;
+  const { name, ext } = parse(setup.source);
+  return `${setup.path}${prefix}${name}${suffix}${ext}`;
 }
 
 
 function getImageResolution(setup) {
-  const resolution = sizeOf(setup.source);
+  const { width, height } = sizeOf(setup.source);
   return {
-    width: setup.width || resolution.width,
-    height: setup.height || resolution.height,
+    width: setup.width || width,
+    height: setup.height || height,
   };
 }
 
@@ -28,7 +28,7 @@ function getScaledImage(sourceImage, width, height) {
 function applyFilters(image, setup) {
   let processedImage = image;
   if (setup.normalize) processedImage = processedImage.normalize();
-  if (setup.contast) processedImage = processedImage.contast(setup.contast);
+  if (setup.contrast) processedImage = processedImage.contrast(setup.contrast);
   if (setup.brightness) processedImage = processedImage.brightness(setup.brightness);
   if (setup.quality) processedImage = processedImage.quality(setup.quality);
   return processedImage;
@@ -63,8 +63,8 @@ module.exports = async (source, settings = {}) => {
 
   try {
     sourceImage = await read(source);
-  } catch (error) {
-    throw new Error(`Problem with reading ${source}, ${error.message}.`);
+  } catch (err) {
+    throw new Error(`Problem with reading ${source}, ${err.message}.`);
   }
 
   return settings.versions.map((version) => {
