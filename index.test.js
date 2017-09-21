@@ -66,6 +66,7 @@ describe('node-images-resizer npm module', () => {
     test('should return array of file names', () => { expect(result).toEqual(expect.arrayContaining(EXPECTED_OUTPUT)); });
   });
 
+
   describe('when validating data', () => {
     test('should throw error if input data are invalid', async () => {
       try {
@@ -84,6 +85,7 @@ describe('node-images-resizer npm module', () => {
     });
   });
 
+
   describe('when reading file', () => {
     test('should throw error if problem with reading file', async () => {
       const read = jest.fn(() => { throw new Error('ERROR_MESSAGE'); });
@@ -100,11 +102,67 @@ describe('node-images-resizer npm module', () => {
     });
   });
 
-  describe.skip('when generating image', () => {
-    test('should figure out new size of image', () => {});
-    test('should scale image', () => {});
-    test('should apply filters', () => {});
+
+  describe('when generating image', () => {
+    const generateImage = resizerRewireAPI.__GetDependency__('generateImage');
+    const scaleToFit = jest.fn(() => 'scaled_image');
+    const sourceImage = { scaleToFit };
+    const imageSetup = {};
+    const imageResolution = { width: 256, height: 128 };
+    const getImageResolution = jest.fn(() => imageResolution);
+    const applyFilters = jest.fn();
+
+    beforeAll(() => {
+      resizerRewireAPI.__Rewire__({
+        getImageResolution, applyFilters,
+      });
+    });
+
+    afterAll(() => {
+      resizerRewireAPI.__ResetDependency__('getImageResolution');
+      resizerRewireAPI.__ResetDependency__('applyFilters');
+    });
+
+    beforeEach(() => {
+      generateImage(sourceImage, imageSetup);
+    });
+
+    test('should figure out new size of image', () => { expect(getImageResolution).toHaveBeenCalledWith(imageSetup); });
+    test('should scale image', () => { expect(sourceImage.scaleToFit).toHaveBeenCalledWith(256, 128); });
+    test('should apply filters', () => { expect(applyFilters).toHaveBeenCalledWith('scaled_image', imageSetup); });
   });
+
+
+  describe('when calculating file resolution', () => {
+    const getImageResolution = resizerRewireAPI.__GetDependency__('getImageResolution');
+    const imageResolution = { width: 1000, height: 500 };
+    const sizeOf = jest.fn(() => imageResolution);
+
+    beforeAll(() => {
+      resizerRewireAPI.__Rewire__({ sizeOf });
+    });
+
+    afterAll(() => {
+      resizerRewireAPI.__ResetDependency__('sizeOf');
+    });
+
+    test('should choose resolution from the setup', () => {
+      const imageSetup = { width: 256, height: 128 };
+      expect(getImageResolution(imageSetup)).toEqual(imageSetup);
+    });
+
+    test('should reuse actual resolution if none in setup', () => {
+      expect(getImageResolution({})).toEqual(imageResolution);
+    });
+
+    test('should figure out size from incomplete data', () => {
+      expect(getImageResolution({ width: 256 })).toEqual({
+        width: 256,
+        height: 500,
+      });
+    });
+  });
+
 
   describe.skip('when applying filters', () => {
     test('should normalize image', () => {});
@@ -112,6 +170,7 @@ describe('node-images-resizer npm module', () => {
     test('should update brightness', () => {});
     test('should compress image by setting up quality', () => {});
   });
+
 
   describe.skip('when creating file names', () => {
     test('should return file name with full path', () => {});

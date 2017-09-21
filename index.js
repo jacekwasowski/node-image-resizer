@@ -20,11 +20,6 @@ function getImageResolution(setup) {
 }
 
 
-function getScaledImage(sourceImage, width, height) {
-  return sourceImage.scaleToFit(width, height);
-}
-
-
 function applyFilters(image, setup) {
   let processedImage = image;
   if (setup.normalize) processedImage = processedImage.normalize();
@@ -42,7 +37,7 @@ function saveFile(generatedImage, fileNameWithPath) {
 
 function generateImage(sourceImage, setup) {
   const { width, height } = getImageResolution(setup);
-  const scaledImage = getScaledImage(sourceImage, width, height);
+  const scaledImage = sourceImage.scaleToFit(width, height);
   return applyFilters(scaledImage, setup);
 }
 
