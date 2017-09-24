@@ -7,7 +7,7 @@ function getFileNameWithPath(setup) {
   const prefix = setup.prefix || '';
   const suffix = setup.suffix || '';
   const { name, ext } = parse(setup.source);
-  return `${setup.path}${prefix}${name}${suffix}${ext}`;
+  return `${setup.path || ''}${prefix}${name}${suffix}${ext}`;
 }
 
 

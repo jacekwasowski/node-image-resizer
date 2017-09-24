@@ -2,12 +2,6 @@ import resizer, {
   __RewireAPI__ as resizerRewireAPI,
 } from '.';
 
-const SOURCE = 'test-images/image.jpg';
-const EXPECTED_OUTPUT = [
-  './results/image_large.jpg',
-  './results/image_medium.jpg',
-  './results/image_small.jpg',
-];
 const setup = {
   all: {
     brightness: 0,
@@ -30,18 +24,27 @@ const setup = {
   }],
 };
 
+const sourceImage = {
+  scaleToFit: jest.fn(() => sourceImage),
+  normalize: jest.fn(() => sourceImage),
+  contrast: jest.fn(() => sourceImage),
+  brightness: jest.fn(() => sourceImage),
+  quality: jest.fn(() => sourceImage),
+  write: jest.fn(),
+};
+
 let result;
 
-describe('node-images-resizer npm module', () => {
+describe('node-images-resizer', () => {
   describe('when calling', () => {
-    const read = jest.fn().mockReturnValue('sourceImage');
-    const generateImage = jest.fn();
-    const saveFile = jest.fn();
+    const source = '/source/image.jpg';
+    const read = jest.fn(() => sourceImage);
+    const generateImage = jest.fn(() => sourceImage);
     const isInputDataValid = jest.fn().mockReturnValue(true);
 
     beforeAll(() => {
       resizerRewireAPI.__Rewire__({
-        read, isInputDataValid, generateImage, saveFile,
+        read, isInputDataValid, generateImage,
       });
     });
 
@@ -49,11 +52,10 @@ describe('node-images-resizer npm module', () => {
       resizerRewireAPI.__ResetDependency__('read');
       resizerRewireAPI.__ResetDependency__('isInputDataValid');
       resizerRewireAPI.__ResetDependency__('generateImage');
-      resizerRewireAPI.__ResetDependency__('saveFile');
     });
 
     beforeEach(async () => {
-      result = await resizer(SOURCE, setup);
+      result = await resizer(source, setup);
     });
 
     afterEach(() => {
@@ -61,30 +63,38 @@ describe('node-images-resizer npm module', () => {
     });
 
     test('should validate input data', () => { expect(isInputDataValid).toHaveBeenCalledTimes(1); });
-    test('should read source image', () => { expect(read).toHaveBeenCalledWith(SOURCE); });
+    test('should read source image', () => { expect(read).toHaveBeenCalledWith(source); });
     test('should generate images', () => { expect(generateImage).toHaveBeenCalledTimes(3); });
-    test('should return array of file names', () => { expect(result).toEqual(expect.arrayContaining(EXPECTED_OUTPUT)); });
+    test('should return array of file names', () => {
+      expect(result).toEqual(expect.arrayContaining([
+        './results/image_large.jpg',
+        './results/image_medium.jpg',
+        './results/image_small.jpg',
+      ]));
+    });
   });
 
 
   describe('when validating data', () => {
     test('should throw error if input data is invalid', async () => {
+      const source = '/source/testImage.jpg';
+
       try {
-        await resizer(SOURCE, 'invalid_param');
+        await resizer(source, 'invalid_param');
       } catch (err) {
         expect(err.name).toEqual('Error');
         expect(err.message).toEqual('Invalid input data.');
       }
 
       try {
-        await resizer(SOURCE, null);
+        await resizer(source, null);
       } catch (err) {
         expect(err.name).toEqual('Error');
         expect(err.message).toEqual('Invalid input data.');
       }
 
       try {
-        await resizer(SOURCE);
+        await resizer(source);
       } catch (err) {
         expect(err.name).toEqual('Error');
         expect(err.message).toEqual('Invalid input data.');
@@ -99,10 +109,10 @@ describe('node-images-resizer npm module', () => {
       resizerRewireAPI.__Rewire__({ read });
 
       try {
-        await resizer('notExists.jpg', setup);
+        await resizer('./fileDoesNotExist.jpg', setup);
       } catch (err) {
         expect(err.name).toEqual('Error');
-        expect(err.message).toEqual('Problem with reading notExists.jpg, ERROR_MESSAGE.');
+        expect(err.message).toEqual('Problem with reading ./fileDoesNotExist.jpg, ERROR_MESSAGE.');
       }
 
       resizerRewireAPI.__ResetDependency__('read');
@@ -113,8 +123,7 @@ describe('node-images-resizer npm module', () => {
   describe('when generating image', () => {
     const generateImage = resizerRewireAPI.__GetDependency__('generateImage');
     const scaleToFit = jest.fn(() => 'scaled_image');
-    const sourceImage = { scaleToFit };
-    const imageSetup = {};
+    const sourceImageToScale = { scaleToFit };
     const imageResolution = { width: 256, height: 128 };
     const getImageResolution = jest.fn(() => imageResolution);
     const applyFilters = jest.fn();
@@ -131,12 +140,12 @@ describe('node-images-resizer npm module', () => {
     });
 
     beforeEach(() => {
-      generateImage(sourceImage, imageSetup);
+      generateImage(sourceImageToScale, {});
     });
 
-    test('should figure out new size of image', () => { expect(getImageResolution).toHaveBeenCalledWith(imageSetup); });
-    test('should scale image', () => { expect(sourceImage.scaleToFit).toHaveBeenCalledWith(256, 128); });
-    test('should apply filters', () => { expect(applyFilters).toHaveBeenCalledWith('scaled_image', imageSetup); });
+    test('should figure out new size of image', () => { expect(getImageResolution).toHaveBeenCalledWith({}); });
+    test('should scale image', () => { expect(sourceImageToScale.scaleToFit).toHaveBeenCalledWith(256, 128); });
+    test('should apply filters', () => { expect(applyFilters).toHaveBeenCalledWith('scaled_image', {}); });
   });
 
 
@@ -208,9 +217,29 @@ describe('node-images-resizer npm module', () => {
   });
 
 
-  describe.skip('when creating file names', () => {
-    test('should return file name with full path', () => {});
-    test('should return file name with prefix', () => {});
-    test('should return file name with suffix', () => {});
+  describe('when creating file name', () => {
+    const getFileNameWithPath = resizerRewireAPI.__GetDependency__('getFileNameWithPath');
+
+    test('should return file name with full path', () => {
+      const imageSetup = {
+        source: '/image/in/some/folder/fileName.jpg',
+        path: '/destination/',
+      };
+      expect(getFileNameWithPath(imageSetup)).toBe('/destination/fileName.jpg');
+    });
+    test('should return file name with prefix', () => {
+      const imageSetup = {
+        source: '/image/in/some/folder/fileName.jpg',
+        prefix: 'prefix_',
+      };
+      expect(getFileNameWithPath(imageSetup)).toBe('prefix_fileName.jpg');
+    });
+    test('should return file name with suffix', () => {
+      const imageSetup = {
+        source: '/image/in/some/folder/fileName.jpg',
+        suffix: '_suffix',
+      };
+      expect(getFileNameWithPath(imageSetup)).toBe('fileName_suffix.jpg');
+    });
   });
 });
