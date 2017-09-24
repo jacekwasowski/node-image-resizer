@@ -68,7 +68,7 @@ describe('node-images-resizer npm module', () => {
 
 
   describe('when validating data', () => {
-    test('should throw error if input data are invalid', async () => {
+    test('should throw error if input data is invalid', async () => {
       try {
         await resizer(SOURCE, 'invalid_param');
       } catch (err) {
@@ -78,6 +78,13 @@ describe('node-images-resizer npm module', () => {
 
       try {
         await resizer(SOURCE, null);
+      } catch (err) {
+        expect(err.name).toEqual('Error');
+        expect(err.message).toEqual('Invalid input data.');
+      }
+
+      try {
+        await resizer(SOURCE);
       } catch (err) {
         expect(err.name).toEqual('Error');
         expect(err.message).toEqual('Invalid input data.');
@@ -92,10 +99,10 @@ describe('node-images-resizer npm module', () => {
       resizerRewireAPI.__Rewire__({ read });
 
       try {
-        await resizer('not_exists.jpg', setup);
+        await resizer('notExists.jpg', setup);
       } catch (err) {
         expect(err.name).toEqual('Error');
-        expect(err.message).toEqual('Problem with reading not_exists.jpg, ERROR_MESSAGE.');
+        expect(err.message).toEqual('Problem with reading notExists.jpg, ERROR_MESSAGE.');
       }
 
       resizerRewireAPI.__ResetDependency__('read');
@@ -156,19 +163,48 @@ describe('node-images-resizer npm module', () => {
     });
 
     test('should figure out size from incomplete data', () => {
-      expect(getImageResolution({ width: 256 })).toEqual({
-        width: 256,
-        height: 500,
-      });
+      expect(getImageResolution({ width: 256 })).toEqual({ width: 256, height: 500 });
     });
   });
 
 
-  describe.skip('when applying filters', () => {
-    test('should normalize image', () => {});
-    test('should update contrast', () => {});
-    test('should update brightness', () => {});
-    test('should compress image by setting up quality', () => {});
+  describe('when applying filters', () => {
+    const applyFilters = resizerRewireAPI.__GetDependency__('applyFilters');
+    const image = {
+      normalize: jest.fn(() => image),
+      contrast: jest.fn(() => image),
+      brightness: jest.fn(() => image),
+      quality: jest.fn(() => image),
+    };
+    const imageSetup = {
+      normalize: true,
+      contrast: 10,
+      brightness: 20,
+      quality: 90,
+    };
+
+    afterEach(() => {
+      image.normalize.mockReset();
+      image.contrast.mockReset();
+      image.brightness.mockReset();
+      image.quality.mockReset();
+    });
+
+    test('should normalize image, update contrast and brightness and compress image', () => {
+      applyFilters(image, imageSetup);
+      expect(image.normalize).toHaveBeenCalledTimes(1);
+      expect(image.contrast).toHaveBeenCalledWith(10);
+      expect(image.brightness).toHaveBeenCalledWith(20);
+      expect(image.quality).toHaveBeenCalledWith(90);
+    });
+
+    test('should NOT normalize image, update contrast and brightness and compress image', () => {
+      applyFilters(image, {});
+      expect(image.normalize).not.toHaveBeenCalled();
+      expect(image.contrast).not.toHaveBeenCalled();
+      expect(image.brightness).not.toHaveBeenCalled();
+      expect(image.quality).not.toHaveBeenCalled();
+    });
   });
 
 
