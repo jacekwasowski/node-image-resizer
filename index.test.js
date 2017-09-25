@@ -227,6 +227,7 @@ describe('node-images-resizer', () => {
       };
       expect(getFileNameWithPath(imageSetup)).toBe('/destination/fileName.jpg');
     });
+
     test('should return file name with prefix', () => {
       const imageSetup = {
         source: '/image/in/some/folder/fileName.jpg',
@@ -234,6 +235,7 @@ describe('node-images-resizer', () => {
       };
       expect(getFileNameWithPath(imageSetup)).toBe('prefix_fileName.jpg');
     });
+
     test('should return file name with suffix', () => {
       const imageSetup = {
         source: '/image/in/some/folder/fileName.jpg',
