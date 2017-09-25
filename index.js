@@ -50,11 +50,11 @@ function isInputDataValid(settings) {
 
 
 /**
- * Get image file and generate its small copies asynchronously based on settings.
+ * Get image and generate its smaller copies asynchronously based on settings.
  *
- * @param {String} source - file name with full path.
- * @param {Object} settings - general and particular settings for each version.
- * @returns {Promise.<String[]>} - list of generated file names with full paths.
+ * @param {String} source - file name with path.
+ * @param {Object} settings - general and particular settings for each miniature.
+ * @returns {Promise.<String[]>} - list of generated file names with paths.
  */
 module.exports = async (source, settings = {}) => {
   let sourceImage;

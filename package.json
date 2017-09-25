@@ -1,7 +1,7 @@
 {
   "name": "node-images-resizer",
   "version": "1.0.0",
-  "description": "Get image and make it smaller copies asynchronously",
+  "description": "Get image and generate its smaller copies asynchronously.",
   "main": "index.js",
   "dependencies": {
     "image-size": "0.6.1",
