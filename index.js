@@ -55,12 +55,13 @@ function isInputDataValid(settings) {
  * @param {String} source - Path to source file.
  * @param {Object} settings - List af settings.
  * @param {Object} settings.all - List of common settings to applied on each generated image.
+ *   Here keep list of settings you want to apply for each generated image (like quality).
  *
  * @param {Object[]} settings.versions - Set of settings, separate for each images.
- *   Each general setting (from settings.all) can be overwritten.
+ *   Each general setting (from settings.all) can be overwritten here.
  * @param {String} settings.versions[].path - Destination path for generated image.
- * @param {String} settings.versions[].prefix - Prefix for source file name to create new file name.
- * @param {String} settings.versions[].suffix - Suffix for source file name to create new file name.
+ * @param {String} settings.versions[].prefix - Prefix for generated file name.
+ * @param {String} settings.versions[].suffix - Suffix for generated file name.
  * @param {String} settings.versions[].width - The width of the image in px.
  * @param {String} settings.versions[].height - The height of the image in px.
  * @param {Boolean} settings.versions[].normalize - Normalize the channels in an image.
