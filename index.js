@@ -52,9 +52,23 @@ function isInputDataValid(settings) {
 /**
  * Get image and generate its smaller copies asynchronously based on settings.
  *
- * @param {String} source - file name with path.
- * @param {Object} settings - general and particular settings for each miniature.
- * @returns {Promise.<String[]>} - list of generated file names with paths.
+ * @param {String} source - Path to source file.
+ * @param {Object} settings - List af settings.
+ * @param {Object} settings.all - List of common settings to applied on each generated image.
+ *
+ * @param {Object[]} settings.versions - Set of settings, separate for each images.
+ *   Each general setting (from settings.all) can be overwritten.
+ * @param {String} settings.versions[].path - Destination path for generated image.
+ * @param {String} settings.versions[].prefix - Prefix for source file name to create new file name.
+ * @param {String} settings.versions[].suffix - Suffix for source file name to create new file name.
+ * @param {String} settings.versions[].width - The width of the image in px.
+ * @param {String} settings.versions[].height - The height of the image in px.
+ * @param {Boolean} settings.versions[].normalize - Normalize the channels in an image.
+ * @param {Number} settings.versions[].contrast - Adjust the contrast by a value -1 to +1.
+ * @param {Number} settings.versions[].brightness - Adjust the brightness by a value -1 to +1.
+ * @param {Number} settings.versions[].quality - Set the quality of saved JPEG by a value 0 - 100.
+ *
+ * @returns {Promise.<String[]>} - Array with generated file names with paths.
  */
 module.exports = async (source, settings = {}) => {
   let sourceImage;
