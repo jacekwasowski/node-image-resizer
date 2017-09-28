@@ -3,9 +3,9 @@ env:
   node: true
   jest: true
   es6: true
-plugins: ['unicorn', 'smells']
+plugins: ['smells', 'unicorn']
 rules:
-  arrow-body-style: ['error', 'as-needed']
+  arrow-body-style: [2, 'as-needed']
   handle-callback-err: 2
   no-console: 2
   no-multiple-empty-lines: [2, { max: 2, maxEOF: 1, maxBOF: 0 }]
@@ -29,17 +29,17 @@ rules:
   unicorn/prefer-type-error: 2
   yoda: 2
   valid-jsdoc: [2, {
-    requireReturn: true,
-    requireReturnDescription: true,
-    requireParamDescription: true,
     prefer: {
       return: returns
     },
     preferType: {
-      Integer: Number,
-      string: String,
-      boolean: Boolean,
+      array: Array,
       object: Object,
-      array: Array
-    }
+      error: Error,
+      promise: Promise,
+      Function: function
+    },
+    requireParamDescription: true,
+    requireReturn: true,
+    requireReturnDescription: true
   }]

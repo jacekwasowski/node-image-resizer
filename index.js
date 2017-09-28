@@ -52,24 +52,24 @@ function isInputDataValid(settings) {
 /**
  * Get image and generate its smaller copies asynchronously based on settings.
  *
- * @param {String} source - Path to source file.
+ * @param {string} source - Path to source file.
  * @param {Object} settings - List af settings.
- * @param {Object} settings.all - List of common settings to applied on each generated image.
- *   Here keep list of settings you want to apply for each generated image (like quality).
+ * @param {Object} settings.all - Common settings to applied on each generated image.
+ * @param {Object[]} settings.versions - Set of settings, separate for each generated images.
+ *   Each setting from settings.all can be overwritten by setting from here.
  *
- * @param {Object[]} settings.versions - Set of settings, separate for each images.
- *   Each general setting (from settings.all) can be overwritten here.
- * @param {String} settings.versions[].path - Destination path for generated image.
- * @param {String} settings.versions[].prefix - Prefix for generated file name.
- * @param {String} settings.versions[].suffix - Suffix for generated file name.
- * @param {String} settings.versions[].width - The width of the image in px.
- * @param {String} settings.versions[].height - The height of the image in px.
- * @param {Boolean} settings.versions[].normalize - Normalize the channels in an image.
- * @param {Number} settings.versions[].contrast - Adjust the contrast by a value -1 to +1.
- * @param {Number} settings.versions[].brightness - Adjust the brightness by a value -1 to +1.
- * @param {Number} settings.versions[].quality - Set the quality of saved JPEG by a value 0 - 100.
+ * @param {string} settings.versions[].path - Destination path for generated image.
+ * @param {string} settings.versions[].prefix - Prefix for file name.
+ * @param {string} settings.versions[].suffix - Suffix for file name.
+ * @param {number} settings.versions[].width - Width of the new image in px.
+ * @param {number} settings.versions[].height - Height of the new image in px.
+ * @param {number} settings.versions[].contrast - Adjust the contrast by a value -1 to +1.
+ * @param {number} settings.versions[].brightness - Adjust the brightness by a value -1 to +1.
+ * @param {number} settings.versions[].quality - Set the quality of saved JPEG by a value 0 - 100.
+ * @param {boolean} settings.versions[].normalize - Normalize the channels in the new image.
  *
  * @returns {Promise.<String[]>} - Array with generated file names with paths.
+ * @throws {Error} - When an error has occurred.
  */
 module.exports = async (source, settings = {}) => {
   let sourceImage;
