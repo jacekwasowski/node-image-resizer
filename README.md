@@ -8,7 +8,7 @@ $ npm install node-image-resizer --save-dev
 ```
 
 ## Usage
-```ecmascript 6
+```javascript
 import resizer from 'node-image-resizer';
 
 (async () => {
@@ -22,7 +22,7 @@ You can create as many thumbnails from your image as you wish.
 
 All definitions (for each thumbnail separately) are grouped in one object with following structure:
 
-```
+```javascript
 const setup = { 
   all: {}, // general settings to apply on each thumbnail
   versions: [{}, {}, {}] // unique settings for each thumbnail; will overwite general
@@ -30,7 +30,7 @@ const setup = {
 ```
 
 for example:
-```
+```javascript
 const setup = { 
   all: {
     path: './thumbnails/',
@@ -45,7 +45,7 @@ const setup = {
     width: 512,
     height: 256
   }, {
-    quality: 100
+    quality: 100,
     prefix: 'small_',
     width: 128,
     height: 64
