@@ -59,10 +59,10 @@ function isInputDataValid(settings) {
  *   Each setting from settings.all can be overwritten by setting from here.
  *
  * @param {string} settings.versions[].path - Destination path for generated image.
- * @param {string} settings.versions[].prefix - Prefix for file name.
- * @param {string} settings.versions[].suffix - Suffix for file name.
- * @param {number} settings.versions[].width - Width of the new image in px.
- * @param {number} settings.versions[].height - Height of the new image in px.
+ * @param {string} settings.versions[].prefix - Used to create new file name based on source file name.
+ * @param {string} settings.versions[].suffix - Used to create new file name based on source file name.
+ * @param {number} settings.versions[].width - Width of the new image (in px).
+ * @param {number} settings.versions[].height - Height of the new image (in px).
  * @param {number} settings.versions[].contrast - Adjust the contrast by a value -1 to +1.
  * @param {number} settings.versions[].brightness - Adjust the brightness by a value -1 to +1.
  * @param {number} settings.versions[].quality - Set the quality of saved JPEG by a value 0 - 100.
