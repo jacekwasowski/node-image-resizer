@@ -59,8 +59,8 @@ function isInputDataValid(settings) {
  *   Each setting from settings.all can be overwritten by setting from here.
  *
  * @param {string} settings.versions[].path - Destination path for generated image.
- * @param {string} settings.versions[].prefix - Used to create new file name based on source file name.
- * @param {string} settings.versions[].suffix - Used to create new file name based on source file name.
+ * @param {string} settings.versions[].prefix - Used to create file name based on source file name.
+ * @param {string} settings.versions[].suffix - Used to create file name based on source file name.
  * @param {number} settings.versions[].width - Width of the new image (in px).
  * @param {number} settings.versions[].height - Height of the new image (in px).
  * @param {number} settings.versions[].contrast - Adjust the contrast by a value -1 to +1.
@@ -68,7 +68,7 @@ function isInputDataValid(settings) {
  * @param {number} settings.versions[].quality - Set the quality of saved JPEG by a value 0 - 100.
  * @param {boolean} settings.versions[].normalize - Normalize the channels in the new image.
  *
- * @returns {Promise.<String[]>} - Array with generated file names with paths.
+ * @returns {Promise.<String[]>} - Generated file names with paths.
  * @throws {Error} - When an error has occurred.
  */
 module.exports = async (source, settings = {}) => {

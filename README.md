@@ -1,9 +1,8 @@
-# node-images-resizer
+# node-image-resizer
 > Get some image and generate its smaller copies. 
 Control the quality, brightness and contrast. Asynchronously.
 
 ## Installation
-
 ```sh
 $ npm install node-image-resizer --save-dev
 ```
@@ -16,11 +15,12 @@ import resizer from 'node-image-resizer';
   await resizer('./image.jpg', setup);
 })();
 ```
+Returns array of file names (with path) for generated thumbnails.
 
 ## Setup
-You can create as many smaller copier from your image as you wish. 
+You can create as many thumbnails from your image as you wish. 
 
-All definitions (for each thumbnail separately) are grouped in one object `setup` with following structure:
+All definitions (for each thumbnail separately) are grouped in one object with following structure:
 
 ```
 const setup = { 
@@ -52,26 +52,25 @@ const setup = {
   }]
 };
 
-await resizer('./image.jpg', setup);
+// create thumbnails
+const thumbs = await resizer('./image.jpg', setup);
 ```
 Settings from `versions` overwrite values from `all`.
 
-
 ## Supported options
-All optional
+All options are optional.
 
 name | type | default | description
 ---|---|---|---
 path | string |  | Destination path for generated image.
-prefix | string |  | Used to create new file name based on source file name. Will overwrite a file with the same name if exists. 
-suffix | string |  | Used to create new file name based on source file name. Will overwrite a file with the same name if exists.
+prefix | string |  | Used to create file name based on source file name. Will overwrite a file with the same name if exists. 
+suffix | string |  | Used to create file name based on source file name. Will overwrite a file with the same name if exists.
 width | number | source image width | Width of the new image (in px).
 height | number | source image height | Height of the new image (in px).
 contrast | number |  | Adjust the contrast by a value -1 to +1.
 brightness | number |  | Adjust the brightness by a value -1 to +1.
 quality | number |  | Set the quality of saved JPEG by a value 0 - 100.
 normalize | boolean | false | Normalize the channels in the new image.
-
 
 
 
