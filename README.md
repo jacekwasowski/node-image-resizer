@@ -8,7 +8,7 @@ Control the quality, brightness and contrast. Asynchronously.
 $ npm install node-image-resizer --save-dev
 ```
 
-##Usage
+## Usage
 ```ecmascript 6
 import resizer from 'node-image-resizer';
 
@@ -17,7 +17,7 @@ import resizer from 'node-image-resizer';
 })();
 ```
 
-##Setup
+## Setup
 You can create as many smaller copier from your image as you wish. 
 
 All definitions (for each thumbnail separately) are grouped in one object `setup` with following structure:
