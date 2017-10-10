@@ -1,10 +1,11 @@
 # node-image-resizer
 > Get some image and generate its smaller copies. 
-Control the quality, brightness and contrast. Asynchronously.
+You can also control the quality, brightness and contrast. Asynchronously.
+
 
 ## Installation
 ```sh
-$ npm install node-image-resizer --save-dev
+npm i -D node-image-resizer
 ```
 
 ## Usage
@@ -17,6 +18,7 @@ import resizer from 'node-image-resizer';
 ```
 Returns array of file names (with path) for generated thumbnails.
 
+
 ## Setup
 You can create as many thumbnails from your image as you wish. 
 
@@ -24,8 +26,8 @@ All definitions (for each thumbnail separately) are grouped in one object with f
 
 ```javascript
 const setup = { 
-  all: {}, // general settings to apply on each thumbnail
-  versions: [{}, {}, {}] // unique settings for each thumbnail; will overwite general
+  all: {},                 // general settings to apply on each thumbnail
+  versions: [{}, {}, {}]   // unique settings for each thumbnail; will overwrite general setting
 };
 ```
 
@@ -57,7 +59,8 @@ const thumbs = await resizer('./image.jpg', setup);
 ```
 Settings from `versions` overwrite values from `all`.
 
-## Supported options
+
+## Options
 All options are optional.
 
 name | type | default | description
@@ -73,7 +76,6 @@ quality | number |  | Set the quality of saved JPEG by a value 0 - 100.
 normalize | boolean | false | Normalize the channels in the new image.
 
 
-
 ## License
 
-[MIT](https://github.com/sottar/react-image-resizer/blob/master/LICENSE)
+MIT

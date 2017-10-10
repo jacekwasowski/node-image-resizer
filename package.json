@@ -14,12 +14,11 @@
     "babel-preset-env": "1.6.0",
     "babel-preset-stage-2": "6.24.1",
     "eslint": "4.8.0",
-    "eslint-config-airbnb-base": "12.0.0",
+    "eslint-config-airbnb-base": "12.0.2",
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-smells": "1.0.1",
     "eslint-plugin-unicorn": "2.1.2",
-    "jest": "21.2.1",
-    "process-nextick-args": "1.0.7"
+    "jest": "21.2.1"
   },
   "scripts": {
     "lint": "eslint .",
@@ -27,7 +26,17 @@
     "unit": "jest --config jest.config.json"
   },
   "engines": {
-    "node": ">=7.6.0"
+    "node": ">=7.6.0",
+    "npm": ">=4.0.0"
+  },
+  "keywords": [
+    "image",
+    "thumbnail",
+    "resize"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jacekwasowski/node-image-resizer"
   },
   "author": "Jacek Wasowski",
   "license": "MIT"
