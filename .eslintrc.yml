@@ -3,7 +3,9 @@ env:
   node: true
   jest: true
   es6: true
-plugins: ['smells', 'unicorn']
+plugins:
+  - smells
+  - unicorn
 rules:
   arrow-body-style: [2, 'as-needed']
   handle-callback-err: 2
